@@ -60,51 +60,44 @@ void Controls::Init(DaisyPatchSM &hw, Engine &engine) {
 }
 
 void Controls::Update(DaisyPatchSM &hw) {
-    params_.UpdateNormalized(Parameter::Frequency,          1.0f - hw.adc.GetFloat(0));
-    params_.UpdateNormalized(Parameter::FeedbackGain,       1.0f - hw.adc.GetFloat(1));
-    params_.UpdateNormalized(Parameter::FeedbackBody,       1.0f - hw.adc.GetFloat(2));
+    params_.UpdateNormalized(Parameter::Frequency,          1.0f - hw.adc.GetFloat(4));
+    params_.UpdateNormalized(Parameter::FeedbackGain,       1.0f - hw.adc.GetFloat(5));
+    params_.UpdateNormalized(Parameter::FeedbackBody,       1.0f - hw.adc.GetFloat(6));
 
-    params_.UpdateNormalized(Parameter::FeedbackLPFCutoff,  1.0f - hw.adc.GetMuxFloat(8, 0));
-    params_.UpdateNormalized(Parameter::FeedbackHPFCutoff,  1.0f - hw.adc.GetMuxFloat(8, 1));
+    params_.UpdateNormalized(Parameter::FeedbackLPFCutoff,  1.0f - hw.adc.GetFloat(0));
+    params_.UpdateNormalized(Parameter::FeedbackHPFCutoff,  1.0f - hw.adc.GetFloat(1));
 
     
-    params_.UpdateNormalized(Parameter::ReverbMix,          1.0f - hw.adc.GetMuxFloat(8, 2));
+    params_.UpdateNormalized(Parameter::ReverbMix,          1.0f - hw.adc.GetFloat(2));
     // Special mapping for reverb feedback/decay (anti-exponential tension curve)
-    params_.UpdateNormalized(Parameter::ReverbDecay,        ftension(1.0f - hw.adc.GetMuxFloat(8, 3), -3.0f));
-    params_.UpdateNormalized(Parameter::EchoDelaySend,      1.0f - hw.adc.GetMuxFloat(8, 4));
+    params_.UpdateNormalized(Parameter::ReverbDecay,        ftension(1.0f - hw.adc.GetFloat(7), -3.0f));
+    params_.UpdateNormalized(Parameter::EchoDelaySend,      1.0f - hw.adc.GetFloat(3));
     // Delay switch doubles or halves delay time instantly for doppler warp
     del_sw_.Debounce();
-    float delay_norm = 1.0f - hw.adc.GetMuxFloat(8, 5);
+    float delay_norm = 0.5f;
     float delay_scale = del_sw_.Pressed() ? 0.5f : 1.0f;
     params_.UpdateNormalized(Parameter::EchoDelayTime, delay_norm * delay_scale);
-    params_.UpdateNormalized(Parameter::EchoDelayFeedback,  1.0f - hw.adc.GetMuxFloat(8, 6)); //1.0f - hw.adc.GetFloat(9));
-    params_.UpdateNormalized(Parameter::OutputVolume,       1.0f - hw.adc.GetMuxFloat(8, 7)); //1.0f - hw.adc.GetFloat(10));
+    params_.UpdateNormalized(Parameter::EchoDelayFeedback,  0.5f);
+    params_.UpdateNormalized(Parameter::OutputVolume,       1.0f);
 }
 
 void Controls::initADCs(DaisyPatchSM &hw) {
-    /** Configure the ADC
-     *
-     *  One channel configured for 8 inputs via CD4051 mux.
-     *
-     */
-    hw.adc.Stop();
+    // AdcChannelConfig config[kNumAdcChannels];
 
-    AdcChannelConfig adc_cfg[9];
-    adc_cfg[3].InitSingle(DaisyPatchSM::C5);
-    adc_cfg[2].InitSingle(DaisyPatchSM::C4);
-    adc_cfg[1].InitSingle(DaisyPatchSM::C3);
-    adc_cfg[0].InitSingle(DaisyPatchSM::C2);
-    adc_cfg[7].InitSingle(DaisyPatchSM::C6);
-    adc_cfg[6].InitSingle(DaisyPatchSM::C7);
-    adc_cfg[5].InitSingle(DaisyPatchSM::C8);
-    adc_cfg[4].InitSingle(DaisyPatchSM::C9);
-    adc_cfg[8].InitMux(DaisyPatchSM::D8, 8, DaisyPatchSM::D2, DaisyPatchSM::D3, DaisyPatchSM::D4);
+    // config[0].InitSingle(kFreqKnobAdcPin);
+    // config[1].InitSingle(kFeedbackGainKnobPin);
+    // config[2].InitSingle(kFeedbackBodyKnobPin);
+    // config[3].InitSingle(kFeedbackLowpassKnobAdcPin);
+    // config[4].InitSingle(kFeedbackHighpassKnobAdcPin);
+    // config[5].InitSingle(kRevMixKnobAdcPin);
+    // config[6].InitSingle(kRevDecayKnobAdcPin);
+    // config[7].InitSingle(kEchoSendKnobAdcPin);
+    // config[8].InitSingle(kEchoTimeKnobAdcPin);
+    // config[9].InitSingle(kEchoFeedbackKnobAdcPin);
+    // config[10].InitSingle(kOutputVolumeAdcPin);
 
-    /** Initialize the ADC with our configuration */
-    hw.adc.Init(adc_cfg, 9);
-
-    /** Start the ADC conversions in the background */
-    hw.adc.Start();
+    // hw.adc.Init(config, kNumAdcChannels);
+    // hw.adc.Start();
 }
 
 void Controls::registerParams(Engine &engine) {
