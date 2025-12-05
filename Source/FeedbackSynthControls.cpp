@@ -60,25 +60,46 @@ void Controls::Init(DaisyPatchSM &hw, Engine &engine) {
 }
 
 void Controls::Update(DaisyPatchSM &hw) {
-    params_.UpdateNormalized(Parameter::Frequency,          1.0f - hw.adc.GetFloat(0));
-    params_.UpdateNormalized(Parameter::FeedbackGain,       1.0f - hw.adc.GetFloat(1));
-    params_.UpdateNormalized(Parameter::FeedbackBody,       1.0f - hw.adc.GetFloat(2));
+    // params_.UpdateNormalized(Parameter::Frequency,          1.0f - hw.adc.GetFloat(0));
+    // params_.UpdateNormalized(Parameter::FeedbackGain,       1.0f - hw.adc.GetFloat(1));
+    // params_.UpdateNormalized(Parameter::FeedbackBody,       1.0f - hw.adc.GetFloat(2));
 
-    params_.UpdateNormalized(Parameter::FeedbackLPFCutoff,  1.0f - hw.adc.GetMuxFloat(8, 0));
-    params_.UpdateNormalized(Parameter::FeedbackHPFCutoff,  1.0f - hw.adc.GetMuxFloat(8, 1));
+    // params_.UpdateNormalized(Parameter::FeedbackLPFCutoff,  1.0f - hw.adc.GetMuxFloat(8, 0));
+    // params_.UpdateNormalized(Parameter::FeedbackHPFCutoff,  1.0f - hw.adc.GetMuxFloat(8, 1));
 
     
-    params_.UpdateNormalized(Parameter::ReverbMix,          1.0f - hw.adc.GetMuxFloat(8, 2));
-    // Special mapping for reverb feedback/decay (anti-exponential tension curve)
-    params_.UpdateNormalized(Parameter::ReverbDecay,        ftension(1.0f - hw.adc.GetMuxFloat(8, 3), -3.0f));
-    params_.UpdateNormalized(Parameter::EchoDelaySend,      1.0f - hw.adc.GetMuxFloat(8, 4));
-    // Delay switch doubles or halves delay time instantly for doppler warp
+    // params_.UpdateNormalized(Parameter::ReverbMix,          1.0f - hw.adc.GetMuxFloat(8, 2));
+    // // Special mapping for reverb feedback/decay (anti-exponential tension curve)
+    // params_.UpdateNormalized(Parameter::ReverbDecay,        ftension(1.0f - hw.adc.GetMuxFloat(8, 3), -3.0f));
+    // params_.UpdateNormalized(Parameter::EchoDelaySend,      1.0f - hw.adc.GetMuxFloat(8, 4));
+    // // Delay switch doubles or halves delay time instantly for doppler warp
+    // del_sw_.Debounce();
+    // float delay_norm = 1.0f - hw.adc.GetMuxFloat(8, 5);
+    // float delay_scale = del_sw_.Pressed() ? 0.5f : 1.0f;
+    // params_.UpdateNormalized(Parameter::EchoDelayTime, delay_norm * delay_scale);
+    // params_.UpdateNormalized(Parameter::EchoDelayFeedback,  1.0f - hw.adc.GetMuxFloat(8, 6)); //1.0f - hw.adc.GetFloat(9));
+    // params_.UpdateNormalized(Parameter::OutputVolume,       1.0f - hw.adc.GetMuxFloat(8, 7)); //1.0f - hw.adc.GetFloat(10));
+
+    params_.UpdateNormalized(Parameter::ReverbMix,          1.0f);
+    params_.UpdateNormalized(Parameter::EchoDelaySend,      1.0f);
+    params_.UpdateNormalized(Parameter::OutputVolume,       1.0f ); //1.0f - hw.adc.GetFloat(10));
+
+
+
+
+    params_.UpdateNormalized(Parameter::Frequency,          1.0f - hw.adc.GetMuxFloat(8,0));
+    params_.UpdateNormalized(Parameter::FeedbackGain,       1.0f - hw.adc.GetMuxFloat(8,1));
+    params_.UpdateNormalized(Parameter::FeedbackBody,       1.0f - hw.adc.GetMuxFloat(8,2));
     del_sw_.Debounce();
-    float delay_norm = 1.0f - hw.adc.GetMuxFloat(8, 5);
+    float delay_norm = 1.0f - hw.adc.GetMuxFloat(8, 3);
     float delay_scale = del_sw_.Pressed() ? 0.5f : 1.0f;
     params_.UpdateNormalized(Parameter::EchoDelayTime, delay_norm * delay_scale);
-    params_.UpdateNormalized(Parameter::EchoDelayFeedback,  1.0f - hw.adc.GetMuxFloat(8, 6)); //1.0f - hw.adc.GetFloat(9));
-    params_.UpdateNormalized(Parameter::OutputVolume,       1.0f - hw.adc.GetMuxFloat(8, 7)); //1.0f - hw.adc.GetFloat(10));
+
+    params_.UpdateNormalized(Parameter::FeedbackLPFCutoff,  1.0f - hw.adc.GetMuxFloat(8, 4));
+    params_.UpdateNormalized(Parameter::FeedbackHPFCutoff,  1.0f - hw.adc.GetMuxFloat(8, 5));
+    params_.UpdateNormalized(Parameter::ReverbDecay,        ftension(1.0f - hw.adc.GetMuxFloat(8, 6), -3.0f));
+    params_.UpdateNormalized(Parameter::EchoDelayFeedback,  1.0f - hw.adc.GetMuxFloat(8, 7));
+
 }
 
 void Controls::initADCs(DaisyPatchSM &hw) {
