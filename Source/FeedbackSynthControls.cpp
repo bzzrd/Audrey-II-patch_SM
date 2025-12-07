@@ -87,18 +87,18 @@ void Controls::Update(DaisyPatchSM &hw) {
 
 
 
-    params_.UpdateNormalized(Parameter::Frequency,          1.0f - hw.adc.GetMuxFloat(8,0));
-    params_.UpdateNormalized(Parameter::FeedbackGain,       1.0f - hw.adc.GetMuxFloat(8,1));
-    params_.UpdateNormalized(Parameter::FeedbackBody,       1.0f - hw.adc.GetMuxFloat(8,2));
+    params_.UpdateNormalized(Parameter::Frequency,          DSY_CLAMP(1.0f - hw.adc.GetMuxFloat(8, 0) + 2.0f * (1.0f- hw.adc.GetFloat(0) - 0.5f),0.0f,1.0f));
+    params_.UpdateNormalized(Parameter::FeedbackGain,       DSY_CLAMP(1.0f - hw.adc.GetMuxFloat(8, 1) + 2.0f * (1.0f- hw.adc.GetFloat(1) - 0.5f),0.0f,1.0f));
+    params_.UpdateNormalized(Parameter::FeedbackBody,       DSY_CLAMP(1.0f - hw.adc.GetMuxFloat(8, 2) + 2.0f * (1.0f- hw.adc.GetFloat(2) - 0.5f),0.0f,1.0f));
     del_sw_.Debounce();
-    float delay_norm = 1.0f - hw.adc.GetMuxFloat(8, 3);
+    float delay_norm = DSY_CLAMP(1.0f - hw.adc.GetMuxFloat(8, 3) + 2.0f * (1.0f- hw.adc.GetFloat(3) - 0.5f),0.0f,1.0f);
     float delay_scale = del_sw_.Pressed() ? 0.5f : 1.0f;
     params_.UpdateNormalized(Parameter::EchoDelayTime, delay_norm * delay_scale);
 
-    params_.UpdateNormalized(Parameter::FeedbackLPFCutoff,  1.0f - hw.adc.GetMuxFloat(8, 4));
-    params_.UpdateNormalized(Parameter::FeedbackHPFCutoff,  1.0f - hw.adc.GetMuxFloat(8, 5));
-    params_.UpdateNormalized(Parameter::ReverbDecay,        ftension(1.0f - hw.adc.GetMuxFloat(8, 6), -3.0f));
-    params_.UpdateNormalized(Parameter::EchoDelayFeedback,  1.0f - hw.adc.GetMuxFloat(8, 7));
+    params_.UpdateNormalized(Parameter::FeedbackLPFCutoff,  DSY_CLAMP(1.0f - hw.adc.GetMuxFloat(8, 4) + 2.0f * (1.0f- hw.adc.GetFloat(4) - 0.5f),0.0f,1.0f));
+    params_.UpdateNormalized(Parameter::FeedbackHPFCutoff,  DSY_CLAMP(1.0f - hw.adc.GetMuxFloat(8, 5) + 2.0f * (1.0f- hw.adc.GetFloat(5) - 0.5f),0.0f,1.0f));
+    params_.UpdateNormalized(Parameter::ReverbDecay,        ftension(DSY_CLAMP(1.0f - hw.adc.GetMuxFloat(8, 6) + 2.0f * (1.0f- hw.adc.GetFloat(6) - 0.5f),0.0f,1.0f), -3.0f));
+    params_.UpdateNormalized(Parameter::EchoDelayFeedback,  DSY_CLAMP(1.0f - hw.adc.GetMuxFloat(8, 7) + 2.0f * (1.0f- hw.adc.GetFloat(7) - 0.5f),0.0f,1.0f));
 
 }
 
